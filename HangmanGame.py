@@ -8,59 +8,80 @@
 #import webster dictionary module/lib
 
 def new_game():
-    global answer, word, guesses, misses
-    #clear guesses array
-    #clear misses array
+    global answer, answerWithSpace, word, guesses, misses, notGuessed
+    guesses = ""
+    misses = ""
+    word = ""
     #get_word_from_lib store in answer
-    #for loop create blanks matching letters in answer, store in word
-    print "Let's play! \n"
-    print word
+    answer = notGuessed =  "hangman".upper() #just for testing
+    answerWithSpace = answer.replace(""," ")[1:-1]
+    for ch in range (0, len(answer)):
+        word += "_ "
+    print "Let's play HANGMAN! \n"
     guess()
 
 def guess():
-    global guesses, misses
-    letter = raw_input("Enter a letter: ")
-    #if letter in guesses or misses
+    global guesses, misses, notGuessed, word
+    letter = raw_input("Enter a letter: ").upper()
+    if len(letter) != 1 or not letter.isalpha():
+        print "Invalid guess.\n"
+        guess()
+    elif letter in guesses or letter in misses:
         print "You have already tried this letter.\n"
-    #elif letter in answer
-        #add to guesses
-        #replace '_' with letter (might make helper func)
-    #else:
-        #add to misses
-    check_status()
+        guess()
+    elif letter in answer:
+        notGuessed = notGuessed.replace(letter, "");
+        if len(guesses) == 0:
+            guesses += letter
+        else:
+            guesses += "," + letter
+        word = answerWithSpace
+        for ch in notGuessed:
+                word = word.replace(ch, "_")
+        check_status()
+    else:
+        if len(misses) == 0:
+            misses += letter
+        else:
+            misses += "," + letter
+        check_status()
 
 def check_status():
-    #if word does not contain '_'
+    global word
+    if not "_" in word:
         printHangman()
+        word = answer
         print "You win!\n"
         #print definition of word
+        print "\n\n"
         finished()
-    #elif misses.length == 6
-        global word
-        word = answer
+    elif len(misses.replace(",","")) == 6:
         printHangman()
-        print "You lost!\n"
+        word = answer
+        print "You lost! - the answer was " + word + "\n"
         #print definition of word
+        print "\n\n"
         finished()
-    #else
+    else:
+        printHangman()
         guess()
 
 def printHangman():
     #print hangman[misses.length]
-    #print word
-    #print guesses
-    #print misses
+    print "Word: " + word
+    print "Guess: " + guesses.lower()
+    print "Misses: " + misses.lower()
+    print "\n"
 
-def finished()
-        whatNow = raw_input("Enter 'n' to play again or q to quit")
-        #if whatNow == "n"
+def finished():
+        whatNow = raw_input("Enter 'n' to play again or q to quit: ")
+        if whatNow == "n":
+            print "\n\n"
             new_game()
-        #elif whatNow == "q"
+        elif whatNow == "q":
             exit(0)
-        #else
-            print "Invalid Input."
+        else:
+            print "Invalid Input.\n"
             finished()
 
 new_game()
-
-#see: http://en.wikipedia.org/wiki/Hangman_%28game%29#Example_game
