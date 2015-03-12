@@ -31,8 +31,6 @@ def guess():
         guess()
     elif letter in answer:
         notGuessed = notGuessed.replace(letter, "");
-            guesses += letter
-        else:
         guesses += letter
         word = answerWithSpace
         for ch in notGuessed:
@@ -63,14 +61,77 @@ def check_status():
         guess()
 
 def printResults():
-    #printHangman()
+    printHangman()
     print "Word: " + word
     print "Guess: " + guesses.replace("",",")[1:-1].lower()
     print "Misses: " + misses.replace("",",")[1:-1].lower()
     print "\n"
 
 def printHangman():
-    #len(misses)
+    i = len(misses)
+    if i==0:
+        print "   _____"  
+        print "  |     |"  
+        print "  |"  
+        print "  |"  
+        print "  |"  
+        print "  |"  
+        print "  |"  
+        print "-------"  
+    if i==1:
+        print "   _____"  
+        print "  |     |"  
+        print "  |     0"  
+        print "  |"  
+        print "  |"  
+        print "  |"  
+        print "  |"  
+        print "-------"  
+    if i==2:
+        print "   _____"  
+        print "  |     |"  
+        print "  |     0"  
+        print "  |     |"  
+        print "  |     |"  
+        print "  |"  
+        print "  |"  
+        print "-------"  
+    if i==3:
+        print "   _____"  
+        print "  |     |"  
+        print "  |     0"  
+        print "  |    \\|"  
+        print "  |     |"  
+        print "  |"  
+        print "  |"  
+        print "-------"  
+    if i==4:
+        print "   _____"  
+        print "  |     |"  
+        print "  |     0"  
+        print "  |    \\|/"  
+        print "  |     |"  
+        print "  |"  
+        print "  |"  
+        print "-------"  
+    if i==5:
+        print "   _____"  
+        print "  |     |"  
+        print "  |     0"  
+        print "  |    \\|/"  
+        print "  |     |"  
+        print "  |    /"  
+        print "  |"  
+        print "-------"  
+    if i==6:
+        print "   _____"  
+        print "  |     |"  
+        print "  |     0"  
+        print "  |    \\|/"  
+        print "  |     |"  
+        print "  |    / \\ "  
+        print "  |"  
+        print "-------"  
 
 def finished():
         whatNow = raw_input("Enter 'n' to play again or q to quit: ")
