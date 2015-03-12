@@ -31,47 +31,46 @@ def guess():
         guess()
     elif letter in answer:
         notGuessed = notGuessed.replace(letter, "");
-        if len(guesses) == 0:
             guesses += letter
         else:
-            guesses += "," + letter
+        guesses += letter
         word = answerWithSpace
         for ch in notGuessed:
                 word = word.replace(ch, "_")
         check_status()
     else:
-        if len(misses) == 0:
-            misses += letter
-        else:
-            misses += "," + letter
+        misses += letter
         check_status()
 
 def check_status():
     global word
     if not "_" in word:
-        printHangman()
+        printResults()
         word = answer
         print "You win!\n"
         #print definition of word
         print "\n\n"
         finished()
-    elif len(misses.replace(",","")) == 6:
-        printHangman()
+    elif len(misses) == 6:
+        printResults()
         word = answer
         print "You lost! - the answer was " + word + "\n"
         #print definition of word
         print "\n\n"
         finished()
     else:
-        printHangman()
+        printResults()
         guess()
 
-def printHangman():
-    #print hangman[misses.length]
+def printResults():
+    #printHangman()
     print "Word: " + word
-    print "Guess: " + guesses.lower()
-    print "Misses: " + misses.lower()
+    print "Guess: " + guesses.replace("",",")[1:-1].lower()
+    print "Misses: " + misses.replace("",",")[1:-1].lower()
     print "\n"
+
+def printHangman():
+    #len(misses)
 
 def finished():
         whatNow = raw_input("Enter 'n' to play again or q to quit: ")
