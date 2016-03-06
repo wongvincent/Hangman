@@ -3,6 +3,8 @@
 
 import random
 import json
+import re
+
 # Wordnik API
 from wordnik import *
 apiUrl = 'http://api.wordnik.com/v4'
@@ -10,28 +12,40 @@ apiKey = '3c50e7b5e1e604f09956ea7cca5010850216618e67e05bf76'
 client = swagger.ApiClient(apiKey, apiUrl)
 wordsApi = WordsApi.WordsApi(client)
 
-def getRandomWord():
-    return wordsApi.getRandomWord(includePartOfSpeech='noun',
+def getRandomWord(minCorpus, maxCorpus, minDictionary, maxDictionary, minL, maxL):
+    randomWord = wordsApi.getRandomWord(includePartOfSpeech='noun',
                                  excludePartOfSpeech='conjunction',
                                  hasDictionaryDef='true',
-                                 minCorpusCount=55000,
-                                 maxCorpusCount=-1,
-                                 minDictionaryCount=1,
-                                 maxDictionaryCount=-1,
-                                 minLength=7,
-                                 maxLength=-1).word
+                                 minCorpusCount=minCorpus,
+                                 maxCorpusCount=maxCorpus,
+                                 minDictionaryCount=minDictionary,
+                                 maxDictionaryCount=maxDictionary,
+                                 minLength=minL,
+                                 maxLength=maxL).word
+    if re.search("[\s|\-]", randomWord):
+        return getRandomWord(minCorpus, maxCorpus, minDictionary, maxDictionary, minL, maxL)
+    else:
+        return randomWord
 
-def new_game():
+def new_game(randomWord):
     global answer, answerWithSpace, word, guesses, misses, notGuessed
     guesses = ""
     misses = ""
     word = ""
-    answer = notGuessed = getRandomWord().upper()
+    answer = notGuessed = randomWord.upper()
     answerWithSpace = answer.replace(""," ")[1:-1]
     for ch in range (0, len(answer)):
         word += "_ "
     print "Let's play HANGMAN! \n"
     guess()
+
+def normal_game():
+    randomWord = getRandomWord(500000, -1, 1, 1, 7, -1)
+    new_game(randomWord)
+
+def hard_game():
+    randomWord = getRandomWord(1, 2000, 1, 1, 12, -1)
+    new_game(randomWord)
 
 def guess():
     global guesses, misses, notGuessed, word
@@ -61,14 +75,14 @@ def check_status():
         print "You win!\n"
         #print definition of word
         print "\n\n"
-        finished()
+        start()
     elif len(misses) == 6:
         printResults()
         word = answer
         print "You lost! - the answer was " + word + "\n"
         #print definition of word
         print "\n\n"
-        finished()
+        start()
     else:
         printResults()
         guess()
@@ -146,15 +160,18 @@ def printHangman():
         print "  |"  
         print "-------"  
 
-def finished():
-        whatNow = raw_input("Enter 'n' to play again or q to quit: ")
+def start():
+        whatNow = raw_input("Enter 'n' to play on normal difficulty or 'h' to play on hard difficulty: ")
         if whatNow == "n":
-            print "\n\n"
-            new_game()
-        elif whatNow == "q":
-            exit(0)
+            print "\n"
+            normal_game()
+        elif whatNow == "h":
+            print "\n"
+            hard_game()
+        # elif whatNow == "q":
+        #    exit(0)
         else:
             print "Invalid Input.\n"
-            finished()
+            start()
 
-new_game()
+start()
