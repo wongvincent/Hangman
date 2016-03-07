@@ -1,9 +1,10 @@
 # HANGMAN game
-# An offline Hangman game!
+# A Hangman game!
 
-import random
 import json
 import re
+import socket
+import offlinewords
 
 # Wordnik API
 from wordnik import *
@@ -12,21 +13,21 @@ apiKey = '3c50e7b5e1e604f09956ea7cca5010850216618e67e05bf76'
 client = swagger.ApiClient(apiKey, apiUrl)
 wordsApi = WordsApi.WordsApi(client)
 
-def getRandomWord(minCorpus, maxCorpus, minDictionary, maxDictionary, minL, maxL):
+def getWordOnline(minCorpus, maxCorpus, minDictionary, maxDictionary, minL, maxL):
     randomWord = wordsApi.getRandomWord(includePartOfSpeech='noun',
-                                 excludePartOfSpeech='conjunction',
-                                 hasDictionaryDef='true',
-                                 minCorpusCount=minCorpus,
-                                 maxCorpusCount=maxCorpus,
-                                 minDictionaryCount=minDictionary,
-                                 maxDictionaryCount=maxDictionary,
-                                 minLength=minL,
-                                 maxLength=maxL).word
+                                        excludePartOfSpeech='conjunction',
+                                        hasDictionaryDef='true',
+                                        minCorpusCount=minCorpus,
+                                        maxCorpusCount=maxCorpus,
+                                        minDictionaryCount=minDictionary,
+                                        maxDictionaryCount=maxDictionary,
+                                        minLength=minL,
+                                        maxLength=maxL).word
     if re.search("[\s|\-]", randomWord):
-        return getRandomWord(minCorpus, maxCorpus, minDictionary, maxDictionary, minL, maxL)
+        return getWordOnline(minCorpus, maxCorpus, minDictionary, maxDictionary, minL, maxL)
     else:
-        return randomWord
-
+        return randomWord        
+        
 def new_game(randomWord):
     global answer, answerWithSpace, word, guesses, misses, notGuessed
     guesses = ""
@@ -40,11 +41,17 @@ def new_game(randomWord):
     guess()
 
 def normal_game():
-    randomWord = getRandomWord(500000, -1, 1, 1, 7, -1)
+    if hasConnection:
+        randomWord = getWordOnline(10000, -1, 1, -1, 7, 12)
+    else:
+        randomWord = offlinewords.get_normal_word()
     new_game(randomWord)
 
 def hard_game():
-    randomWord = getRandomWord(1, 2000, 1, 1, 12, -1)
+    if hasConnection:
+        randomWord = getWordOnline(1, 2000, 1, -1, 12, -1)
+    else:
+        randomWord = offlinewords.get_hard_word()
     new_game(randomWord)
 
 def guess():
@@ -161,11 +168,11 @@ def printHangman():
         print "-------"  
 
 def start():
-        whatNow = raw_input("Enter 'n' to play on normal difficulty or 'h' to play on hard difficulty: ")
+        whatNow = raw_input("Enter 'n' to play on normal difficulty or 'd' for a difficult word: ")
         if whatNow == "n":
             print "\n"
             normal_game()
-        elif whatNow == "h":
+        elif whatNow == "d":
             print "\n"
             hard_game()
         # elif whatNow == "q":
@@ -174,4 +181,25 @@ def start():
             print "Invalid Input.\n"
             start()
 
-start()
+def check_connection():
+    try:
+        REMOTE_SERVER = "www.google.com"
+        # see if we can resolve the host name -- tells us if there is a DNS listening
+        host = socket.gethostbyname(REMOTE_SERVER)
+        # connect to the host -- tells us if the host is actually reachable
+        s = socket.create_connection((host, 80), 2)
+        print "Connection found \n"
+        return True
+    except:
+        pass
+    print "No connection \n"
+    return False
+
+
+def main():
+    global hasConnection
+    print "Checking for internet connection... ",
+    hasConnection = check_connection()
+    start()
+
+main()

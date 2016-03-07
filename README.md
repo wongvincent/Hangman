@@ -2,4 +2,4 @@
 
 Python 2.7
 
-Requires internet connection to fetch words.
+If internet connection available, uses online API to fetch words.
